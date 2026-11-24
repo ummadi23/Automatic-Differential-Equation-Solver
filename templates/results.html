@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Solution Results</title>
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 850px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .answer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #166534;
+        }
+
+        .graph {
+            width: 100%;
+            max-width: 700px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: #64748b;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 style="text-align:center;">Differential Equation Solution</h1>
+
+    {% if result %}
+
+    <div class="card">
+
+        <h2>Step-by-Step Solution</h2>
+
+        <div class="step">
+            <h3>Step 1: Given Equation</h3>
+            <p>y'' + ({{ result.a }})y' + ({{ result.b }})y = 0</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Initial Conditions</h3>
+            <p>y(0) = {{ result.y0 }}</p>
+            <p>y'(0) = {{ result.v0 }}</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Laplace Transform</h3>
+            <p>\[ {{ result.equation }} = 0 \]</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Solve for Y(s)</h3>
+            <p>\[ Y(s) = {{ result.Y }} \]</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Partial Fraction Decomposition</h3>
+            <p>\[ Y(s) = {{ result.partial_fractions }} \]</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 6: Inverse Laplace Transform</h3>
+            <div class="answer">
+                \[ y(t) = {{ result.answer }} \]
+            </div>
+
+            <a href="/download-pdf" class="download-btn">
+                Download Solution as PDF
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Solution Graph</h2>
+
+        <img
+            class="graph"
+            src="{{ url_for('static', filename='solution.png') }}"
+            alt="Differential Equation Solution Graph"
+        >
+
+    </div>
+
+    {% endif %}
+
+    <div style="text-align:center;">
+        <a href="/solver" class="back-btn">Back to Solver</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automatic Differential Equation Solver</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['\\(', '\\)']],
+            displayMath: [['\\[', '\\]']]
+        }
+    };
+</script>
+
+<script async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px 15px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        header {
+            background: #1e40af;
+            color: white;
+            text-align: center;
+            padding: 30px 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        h2 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 13px 30px;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 22px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .step {
+            background: #f8fafc;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .answer {
+            background: #eff6ff;
+            border: 2px solid #2563eb;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: bold;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        .graph {
+            width: 100%;
+            max-width: 700px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Automatic Differential Equation Solver</h1>
+        <p>Solve Second-Order Differential Equations Using Laplace Transform</p>
+    </header>
+
+    <div class="card">
+
+        <h2>Enter Equation Details</h2>
+
+        <p>Enter the coefficients and initial conditions below.</p>
+
+        <form action="/solver" method="POST">
+
+            <div class="input-grid">
+
+                <div>
+                    <label>Coefficient a</label>
+                    <input type="number" step="any" name="a" value="{{ result.a if result else '' }}" required>
+                </div>
+
+                <div>
+                    <label>Coefficient b</label>
+                    <input type="number" step="any" name="b" value="{{ result.b if result else '' }}" required>
+                </div>
+
+                <div>
+                    <label>Initial Condition y(0)</label>
+                    <input type="number" step="any" name="y0" value="{{ result.y0 if result else '' }}" required>
+                </div>
+
+                <div>
+                    <label>Initial Condition y'(0)</label>
+                    <input type="number" step="any" name="v0" value="{{ result.v0 if result else '' }}" required>
+                </div>
+
+            </div>
+
+            <button type="submit">Solve Equation</button>
+
+            <button type="button" onclick="resetForm()" style="background: #64748b;">
+                Reset
+            </button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+    </div>
+
+    {% if result %}
+
+    <div class="card">
+
+        <h2>Step-by-Step Solution</h2>
+
+        <div class="step">
+            <h3>Step 1: Given Equation</h3>
+            <p>y'' + ({{ result.a }})y' + ({{ result.b }})y = 0</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Initial Conditions</h3>
+            <p>y(0) = {{ result.y0 }}</p>
+            <p>y'(0) = {{ result.v0 }}</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Laplace Transform</h3>
+            <p>\[ {{ result.equation }} = 0 \]</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Solve for Y(s)</h3>
+            <p>\[ Y(s) = {{ result.Y }} \]</p>
+        </div>
+        <div class="step">
+            <h3>Step 5: Partial Fraction Decomposition</h3>
+            <p>\[ Y(s) = {{ result.partial_fractions }} \]</p>
+            </div>
+
+        <div class="step">
+            <h3>Step 6: Inverse Laplace Transform</h3>
+            <div class="answer">
+                \[ y(t) = {{ result.answer }} \]
+            </div>
+            <a href="/download-pdf" class="download-btn">
+                Download Solution as PDF
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Step 6: Solution Graph</h2>
+
+        <img
+            class="graph"
+            src="{{ url_for('static', filename='solution.png') }}"
+            alt="Differential Equation Solution Graph"
+        >
+
+    </div>
+
+    {% endif %}
+
+    <footer>
+        <p>Automatic Differential Equation Solver | Laplace Transform Method</p>
+    </footer>
+
+</div>
+<script>
+    function resetForm() {
+        document.querySelector("form").reset();
+        window.location.href = "/solver";
+    }
+</script>
+
+</body>
+</html>
